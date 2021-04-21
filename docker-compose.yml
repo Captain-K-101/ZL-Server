@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+    py-serv:
+      build: './django-app/.'
+      restart: on-failure
+      environment:
+        - ALLOW_OVERRIDE=true
+      links:
+        - call-me
+      volumes:
+        - ./files/:<location-to-where-you-storefiles-inside-server>
+      depends_on:
+        - call-me
+
+    call-me:
+      build: './docker-controller/.'
+      restart: on-failure
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      depends_on:
+        - bouncer
+      
+    bouncer:
+      build: './gateway/.'
+      ports:
+        - "5000:80"
+      restart: on-failure
+      
